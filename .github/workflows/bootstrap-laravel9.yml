@@ -1,0 +1,34 @@
+name: Bootstrap Laravel 9
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feature/laravel9-foundation
+          fetch-depth: 0
+
+      - name: Download official Laravel 9 skeleton
+        run: |
+          mkdir -p /tmp/laravel9
+          curl -fsSL https://github.com/laravel/laravel/archive/refs/heads/9.x.tar.gz \
+            | tar -xz --strip-components=1 -C /tmp/laravel9
+          rsync -a --exclude='.git' --exclude='README.md' /tmp/laravel9/ ./
+          rm -f database/database.sqlite
+
+      - name: Commit skeleton
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --cached --quiet && exit 0
+          git commit -m "Scaffold Laravel 9 application [skip bootstrap]"
+          git push origin HEAD:feature/laravel9-foundation
