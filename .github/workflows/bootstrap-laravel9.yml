@@ -34,7 +34,7 @@ jobs:
 
       - name: Create Laravel 9 skeleton
         run: |
-          composer create-project laravel/laravel:^9.0 /tmp/laravel9 --prefer-dist --no-interaction
+          composer create-project laravel/laravel:^9.0 /tmp/laravel9 --prefer-dist --no-interaction --no-install
           rsync -a --exclude='.git' --exclude='README.md' /tmp/laravel9/ ./
           rm -f database/database.sqlite
 
