@@ -25,16 +25,11 @@ jobs:
           ref: feature/laravel9-foundation
           fetch-depth: 0
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          tools: composer:v2
-          coverage: none
-
-      - name: Create Laravel 9 skeleton
+      - name: Download official Laravel 9 skeleton
         run: |
-          composer create-project laravel/laravel:^9.0 /tmp/laravel9 --prefer-dist --no-interaction --no-install
+          mkdir -p /tmp/laravel9
+          curl -fsSL https://github.com/laravel/laravel/archive/refs/heads/9.x.tar.gz \
+            | tar -xz --strip-components=1 -C /tmp/laravel9
           rsync -a --exclude='.git' --exclude='README.md' /tmp/laravel9/ ./
           rm -f database/database.sqlite
 
