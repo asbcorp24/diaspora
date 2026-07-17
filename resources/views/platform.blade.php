@@ -12,9 +12,9 @@
         $secondary = data_get($currentDiaspora->theme, 'secondary', '#2C5DAA');
         $isStaff = auth()->check() && in_array(auth()->user()->role, ['moderator','admin','superadmin'], true);
         $t = $locale === 'uz' ? [
-            'home'=>'Bosh sahifa','community'=>'Muloqot va tanishuv','jobs'=>'Ish','news'=>'Yangiliklar','reviews'=>'Sharhlar','letters'=>'Tayyor xatlar','safety'=>'Xavfsizlik','messages'=>'Xabarlar','admin'=>'Boshqaruv','login'=>'Kirish','register'=>'Ro‘yxatdan o‘tish','logout'=>'Chiqish','search'=>'Qidirish','send'=>'Yuborish'
+            'home'=>'Bosh sahifa','community'=>'Muloqot va tanishuv','jobs'=>'Ish','news'=>'Yangiliklar','reviews'=>'Sharhlar','letters'=>'Huquqiy yordam','safety'=>'Xavfsizlik','messages'=>'Xabarlar','admin'=>'Boshqaruv','login'=>'Kirish','register'=>'Ro‘yxatdan o‘tish','logout'=>'Chiqish','search'=>'Qidirish','send'=>'Yuborish'
         ] : [
-            'home'=>'Главная','community'=>'Общение и знакомства','jobs'=>'Работа','news'=>'Новости','reviews'=>'Отзывы','letters'=>'Готовые письма','safety'=>'Безопасность','messages'=>'Сообщения','admin'=>'Админка','login'=>'Войти','register'=>'Регистрация','logout'=>'Выйти','search'=>'Найти','send'=>'Отправить'
+            'home'=>'Главная','community'=>'Общение и знакомства','jobs'=>'Работа','news'=>'Новости','reviews'=>'Отзывы','letters'=>'Юридическая помощь','safety'=>'Безопасность','messages'=>'Сообщения','admin'=>'Админка','login'=>'Войти','register'=>'Регистрация','logout'=>'Выйти','search'=>'Найти','send'=>'Отправить'
         ];
         $tr = function ($value) use ($locale) {
             $data = is_string($value) ? json_decode($value, true) : (array)$value;
@@ -23,7 +23,7 @@
     @endphp
     <style>
         :root{--brand:{{ $primary }};--brand2:{{ $secondary }}}
-        body{background:#f5f7fb}.navbar-brand{color:var(--brand)!important}.btn-brand{background:var(--brand);border-color:var(--brand);color:#fff}.btn-brand:hover{background:var(--brand2);color:#fff}.hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}.card{border:0;box-shadow:0 8px 28px rgba(20,35,65,.07)}.own{background:var(--brand);color:#fff}.news-cover{width:100%;height:180px;object-fit:cover}@media print{nav,footer,.no-print,.alert{display:none!important}.card{box-shadow:none}}
+        body{background:#f5f7fb}.navbar-brand{color:var(--brand)!important}.btn-brand{background:var(--brand);border-color:var(--brand);color:#fff}.btn-brand:hover{background:var(--brand2);color:#fff}.hero{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}.card{border:0;box-shadow:0 8px 28px rgba(20,35,65,.07)}.own{background:var(--brand);color:#fff}.news-cover{width:100%;height:180px;object-fit:cover}.legal-hero{background:linear-gradient(135deg,rgba(22,123,90,.12),rgba(44,93,170,.12));border:1px solid rgba(22,123,90,.12)}.legal-category-title{border-left:4px solid var(--brand);padding-left:.8rem}.legal-template-card{scroll-margin-top:90px}@media print{nav,footer,.no-print,.alert{display:none!important}.card{box-shadow:none}.legal-document{border:0!important}.container{max-width:none!important}}
     </style>
 </head>
 <body>
@@ -87,16 +87,94 @@
     <div class="container py-5"><div class="d-flex justify-content-between align-items-center gap-3 flex-wrap"><h1 class="h2 mb-0">{{ $t['jobs'] }}</h1><a class="btn btn-outline-primary" href="{{ route('reviews',['type'=>'employer']) }}">Отзывы о работодателях</a></div><form class="card card-body my-4"><div class="row g-2"><div class="col-md-4"><input class="form-control" name="search" value="{{ request('search') }}" placeholder="Профессия"></div><div class="col-md-3"><input class="form-control" name="city" value="{{ request('city') }}" placeholder="Город"></div><div class="col-md-2"><label><input type="checkbox" name="official" value="1"> Официально</label></div><div class="col-md-2"><label><input type="checkbox" name="housing" value="1"> С жильём</label></div><div class="col-md-1"><button class="btn btn-brand w-100">{{ $t['search'] }}</button></div></div></form><div class="row g-4"><div class="col-lg-8">@forelse($jobs as $job)<div class="card mb-3"><div class="card-body"><h2 class="h5">{{ $job->title }}</h2><div class="text-muted">{{ $job->employer_name }} · {{ $job->city }}</div><p class="mt-2">{{ Str::limit($job->description,300) }}</p>@if($job->official_employment)<span class="badge text-bg-success">Официально</span>@endif @if($job->housing_provided)<span class="badge text-bg-info">Жильё</span>@endif</div></div>@empty<p>Вакансий нет.</p>@endforelse{{ $jobs->links() }}</div><div class="col-lg-4">@auth<div class="card"><div class="card-body"><h2 class="h5">Разместить вакансию</h2><p class="small text-muted">Публикация после проверки.</p><form method="post" action="{{ route('jobs.store') }}">@csrf<input class="form-control mb-2" name="employer_name" placeholder="Работодатель" required><input class="form-control mb-2" name="tax_id" placeholder="ИНН"><input class="form-control mb-2" name="title" placeholder="Вакансия" required><textarea class="form-control mb-2" name="description" rows="4" placeholder="Условия" required></textarea><input class="form-control mb-2" name="city" placeholder="Город" required><div class="row g-2"><div class="col"><input class="form-control" type="number" name="salary_from" placeholder="От"></div><div class="col"><input class="form-control" type="number" name="salary_to" placeholder="До"></div></div><input class="form-control my-2" name="contact_phone" placeholder="Телефон" required><label class="d-block"><input type="checkbox" name="official_employment" value="1"> Официальное оформление</label><label class="d-block mb-2"><input type="checkbox" name="housing_provided" value="1"> Предоставляется жильё</label><button class="btn btn-brand w-100">На модерацию</button></form></div></div>@else<div class="alert alert-info">Войдите, чтобы разместить вакансию.</div>@endauth</div></div></div>
 
 @elseif($page==='letters')
-    <div class="container py-5"><h1 class="h2">{{ $t['letters'] }}</h1><p class="text-muted">Заполните поля, получите готовое обращение и проверьте его перед отправкой.</p><div class="row g-4">@foreach($templates as $template)@php($fields=json_decode($template->fields,true)?:[])<div class="col-lg-6"><div class="card"><div class="card-body"><h2 class="h5">{{ $tr($template->title) }}</h2><p>{{ $tr($template->description) }}</p><form method="post" action="{{ route('letters.preview',$template->slug) }}">@csrf @foreach($fields as $field)@php($label=$field['label'][$locale]??$field['label']['ru']??$field['name'])<label class="form-label small">{{ $label }}</label><input class="form-control mb-2" name="{{ $field['name'] }}" @required($field['required']??false)>@endforeach<button class="btn btn-brand mt-2">Сформировать</button></form></div></div></div>@endforeach</div></div>
+    @php
+        $legalCategoryLabels = $locale === 'uz' ? [
+            'employment'=>'Mehnat munosabatlari','migration'=>'Migratsiya masalalari','housing'=>'Uy-joy va ijara','family'=>'Oilaviy masalalar','consumer'=>'Iste’molchilar huquqlari','government'=>'Davlat organlariga murojaatlar','documents'=>'Hujjatlar va shaxsiy ma’lumotlar','court'=>'Sud hujjatlari','other'=>'Boshqa'
+        ] : [
+            'employment'=>'Трудовые отношения','migration'=>'Миграционные вопросы','housing'=>'Жильё и аренда','family'=>'Семейные вопросы','consumer'=>'Защита потребителей','government'=>'Обращения в государственные органы','documents'=>'Документы и персональные данные','court'=>'Судебные документы','other'=>'Другие юридические вопросы'
+        ];
+        $groupedTemplates = $templates->groupBy('category');
+    @endphp
+    <div class="container py-5">
+        <section class="legal-hero rounded-4 p-4 p-lg-5 mb-4">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8"><span class="badge text-bg-light border mb-2">{{ $locale==='uz'?'Hujjatlar konstruktori':'Конструктор документов' }}</span><h1 class="display-6 fw-bold">{{ $t['letters'] }}</h1><p class="lead mb-0">{{ $locale==='uz'?'Kerakli namunani tanlang, maydonlarni to‘ldiring va tayyor hujjatni chop eting.':'Выберите юридический шаблон, заполните данные и получите готовый документ для печати или сохранения в PDF.' }}</p></div>
+                <div class="col-lg-4"><div class="alert alert-warning mb-0"><strong>{{ $locale==='uz'?'Muhim':'Важно' }}:</strong> {{ $locale==='uz'?'Namuna advokat maslahatini almashtirmaydi. Yuborishdan oldin ma’lumotlarni tekshiring.':'Шаблон не заменяет консультацию юриста. Перед отправкой проверьте реквизиты, сроки и применимость документа.' }}</div></div>
+            </div>
+        </section>
+
+        @forelse($groupedTemplates as $category => $categoryTemplates)
+            <section class="mb-5">
+                <h2 class="h4 legal-category-title mb-3">{{ $legalCategoryLabels[$category] ?? $category }}</h2>
+                <div class="row g-4">
+                    @foreach($categoryTemplates as $template)
+                        @php($fields = json_decode($template->fields, true) ?: [])
+                        <div class="col-xl-6">
+                            <article class="card legal-template-card h-100" id="template-{{ $template->slug }}">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between gap-3"><div><h3 class="h5 mb-2">{{ $tr($template->title) }}</h3><p class="text-muted">{{ $tr($template->description) }}</p></div><span class="badge rounded-pill text-bg-light border align-self-start">{{ count($fields) }} {{ $locale==='uz'?'maydon':'полей' }}</span></div>
+                                    <form method="post" action="{{ route('letters.preview',$template->slug) }}" class="mt-3">@csrf
+                                        <div class="row g-3">
+                                            @foreach($fields as $field)
+                                                @php
+                                                    $fieldName = preg_replace('/[^a-zA-Z0-9_]/', '', (string)($field['name'] ?? ''));
+                                                    $fieldLabelData = is_array($field['label'] ?? null) ? $field['label'] : ['ru'=>($field['label'] ?? $fieldName)];
+                                                    $fieldLabel = $fieldLabelData[$locale] ?? $fieldLabelData['ru'] ?? reset($fieldLabelData) ?? $fieldName;
+                                                    $placeholderData = is_array($field['placeholder'] ?? null) ? $field['placeholder'] : ['ru'=>($field['placeholder'] ?? '')];
+                                                    $placeholder = $placeholderData[$locale] ?? $placeholderData['ru'] ?? '';
+                                                    $fieldType = in_array($field['type'] ?? 'text',['text','textarea','email','tel','number','date','select'],true) ? $field['type'] : 'text';
+                                                    $fieldOptions = is_array($field['options'] ?? null) ? $field['options'] : [];
+                                                @endphp
+                                                @if($fieldName !== '')
+                                                    <div class="{{ $fieldType === 'textarea' ? 'col-12' : 'col-md-6' }}">
+                                                        <label class="form-label">{{ $fieldLabel }} @if(!empty($field['required']))<span class="text-danger">*</span>@endif</label>
+                                                        @if($fieldType === 'textarea')
+                                                            <textarea class="form-control" name="{{ $fieldName }}" rows="4" placeholder="{{ $placeholder }}" @required(!empty($field['required']))>{{ old($fieldName) }}</textarea>
+                                                        @elseif($fieldType === 'select')
+                                                            <select class="form-select" name="{{ $fieldName }}" @required(!empty($field['required']))>
+                                                                <option value="">{{ $locale==='uz'?'Tanlang':'Выберите' }}</option>
+                                                                @foreach($fieldOptions as $option)
+                                                                    @php
+                                                                        $optionValue = is_array($option) ? ($option['value'] ?? '') : $option;
+                                                                        $optionLabels = is_array($option) && is_array($option['label'] ?? null) ? $option['label'] : ['ru'=>$optionValue];
+                                                                        $optionLabel = $optionLabels[$locale] ?? $optionLabels['ru'] ?? $optionValue;
+                                                                    @endphp
+                                                                    <option value="{{ $optionValue }}" @selected(old($fieldName)===(string)$optionValue)>{{ $optionLabel }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @else
+                                                            <input class="form-control" type="{{ $fieldType }}" name="{{ $fieldName }}" value="{{ old($fieldName) }}" placeholder="{{ $placeholder }}" @required(!empty($field['required']))>
+                                                        @endif
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                        <button class="btn btn-brand mt-4">{{ $locale==='uz'?'Hujjat yaratish':'Сформировать документ' }}</button>
+                                    </form>
+                                </div>
+                            </article>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @empty
+            <div class="card"><div class="card-body p-5 text-center"><h2 class="h4">{{ $locale==='uz'?'Hozircha namunalar yo‘q':'Юридические шаблоны пока не добавлены' }}</h2><p class="text-muted mb-0">{{ $locale==='uz'?'Administrator boshqaruv panelida hujjat namunalarini qo‘shishi mumkin.':'Администратор может создать и опубликовать шаблоны в разделе «Админка → Юридическая помощь».' }}</p></div></div>
+        @endforelse
+    </div>
 
 @elseif($page==='letter_preview')
-    <div class="container py-5" style="max-width:900px"><button class="btn btn-outline-secondary float-end no-print" onclick="window.print()">Печать / PDF</button><h1 class="h3">{{ $tr($template->title) }}</h1><div class="alert alert-warning">Проверьте даты, суммы, адресата. Шаблон не заменяет консультацию юриста.</div><div class="card"><div class="card-body p-4"><pre style="white-space:pre-wrap;font-family:inherit">{!! $body !!}</pre></div></div></div>
+    <div class="container py-5" style="max-width:960px">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-3 no-print"><a class="btn btn-outline-secondary" href="{{ route('letters') }}">← {{ $locale==='uz'?'Orqaga':'К шаблонам' }}</a><button class="btn btn-brand" onclick="window.print()">Печать / PDF</button></div>
+        <h1 class="h3">{{ $tr($template->title) }}</h1>
+        <div class="alert alert-warning">Проверьте ФИО, даты, суммы, адресата и приложения. Документ является шаблоном и не заменяет индивидуальную юридическую консультацию.</div>
+        <div class="card legal-document"><div class="card-body p-4 p-lg-5"><pre style="white-space:pre-wrap;font-family:inherit;font-size:1rem;line-height:1.65;margin:0">{!! $body !!}</pre></div></div>
+    </div>
 
 @elseif($page==='safety')
     <div class="container py-5"><div class="alert alert-danger"><strong>Срочно:</strong> при угрозе жизни звоните 112. Запрещены самосуд, травля и публикация чужих персональных данных.</div><h1 class="h2">{{ $t['safety'] }} и правовая помощь</h1><div class="row g-4"><div class="col-lg-7">@foreach($articles as $article)<div class="card mb-3"><div class="card-body">@if($article->emergency)<span class="badge text-bg-danger">Срочно</span>@endif<h2 class="h5 mt-2">{{ $tr($article->title) }}</h2><p>{{ $tr($article->summary) }}</p><div class="small">{!! nl2br(e($tr($article->body))) !!}</div></div></div>@endforeach{{ $articles->links() }}</div><div class="col-lg-5">@auth<div class="card"><div class="card-body"><h2 class="h5">Сообщить модератору</h2><form method="post" action="{{ route('safety.report') }}">@csrf<select class="form-select mb-2" name="category"><option value="fraud">Мошенничество</option><option value="extortion">Вымогательство</option><option value="documents">Удержание документов</option><option value="violence">Насилие</option><option value="missing_person">Пропавший человек</option><option value="trafficking">Принудительный труд</option><option value="detention">Задержание</option><option value="wage_theft">Невыплата зарплаты</option><option value="other">Другое</option></select><input class="form-control mb-2" name="city" placeholder="Город"><textarea class="form-control mb-2" name="description" rows="6" placeholder="Факты, даты и место" required></textarea><label><input type="checkbox" name="allow_contact" value="1"> Разрешаю связаться</label><input class="form-control my-2" name="contact" placeholder="Контакт"><button class="btn btn-danger w-100">Передать модератору</button></form></div></div>@else<div class="alert alert-info">Войдите, чтобы отправить сообщение модератору.</div>@endauth</div></div></div>
 @endif
 
-<footer class="bg-white border-top mt-5 py-4"><div class="container small text-muted">{{ $currentDiaspora->name }} · {{ now()->year }}. Раздел безопасности предназначен только для законной защиты прав.</div></footer>
+<footer class="bg-white border-top mt-5 py-4"><div class="container small text-muted">{{ $currentDiaspora->name }} · {{ now()->year }}. Материалы юридической помощи являются информационными шаблонами и требуют проверки перед использованием.</div></footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
