@@ -1,14 +1,6 @@
 name: Bootstrap Laravel 9
 
 on:
-  push:
-    branches:
-      - feature/laravel9-foundation
-    paths:
-      - .github/workflows/bootstrap-laravel9.yml
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -16,7 +8,6 @@ permissions:
 
 jobs:
   bootstrap:
-    if: github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip bootstrap]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
