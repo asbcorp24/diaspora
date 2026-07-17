@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Middleware\ResolveDiaspora;
@@ -22,8 +23,8 @@ Route::middleware(ResolveDiaspora::class)->group(function (): void {
     Route::post('/community/posts', [PlatformController::class, 'storePost'])->middleware(['auth', 'throttle:30,1'])->name('posts.store');
 
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews');
-    Route::get('/news', [PlatformController::class, 'news'])->name('news');
-    Route::get('/news/{slug}', [PlatformController::class, 'newsShow'])->name('news.show');
+    Route::get('/news', [NewsController::class, 'index'])->name('news');
+    Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
 
     Route::middleware('auth')->group(function (): void {
         Route::get('/messages', [PlatformController::class, 'messages'])->name('messages');
