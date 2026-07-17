@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Middleware\ResolveDiaspora;
@@ -21,6 +23,8 @@ Route::middleware(ResolveDiaspora::class)->group(function (): void {
     Route::post('/community/posts', [PlatformController::class, 'storePost'])->middleware(['auth', 'throttle:30,1'])->name('posts.store');
 
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews');
+    Route::get('/news', [NewsController::class, 'index'])->name('news');
+    Route::get('/news/{slug}', [NewsController::class, 'show'])->name('news.show');
 
     Route::middleware('auth')->group(function (): void {
         Route::get('/messages', [PlatformController::class, 'messages'])->name('messages');
@@ -33,15 +37,40 @@ Route::middleware(ResolveDiaspora::class)->group(function (): void {
         Route::post('/reviews/employers', [ReviewController::class, 'storeEmployer'])->middleware('throttle:5,10')->name('reviews.employer.store');
         Route::post('/reviews/rentals', [ReviewController::class, 'storeRental'])->middleware('throttle:5,10')->name('reviews.rental.store');
         Route::post('/reviews/{type}/{review}/report', [ReviewController::class, 'report'])
-            ->where('type', 'employer|rental')
-            ->where('review', '[0-9]+')
-            ->middleware('throttle:10,10')
-            ->name('reviews.report');
+            ->where('type', 'employer|rental')->where('review', '[0-9]+')->middleware('throttle:10,10')->name('reviews.report');
         Route::get('/reviews-moderation', [ReviewController::class, 'moderation'])->name('reviews.moderation');
         Route::post('/reviews-moderation/{type}/{review}', [ReviewController::class, 'moderate'])
-            ->where('type', 'employer|rental')
-            ->where('review', '[0-9]+')
-            ->name('reviews.moderate');
+            ->where('type', 'employer|rental')->where('review', '[0-9]+')->name('reviews.moderate');
+    });
+
+    Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+        Route::patch('/jobs/{job}', [AdminController::class, 'updateJob'])->whereNumber('job')->name('jobs.update');
+        Route::patch('/posts/{post}', [AdminController::class, 'updatePost'])->whereNumber('post')->name('posts.update');
+        Route::patch('/reviews/{type}/{review}', [AdminController::class, 'updateReview'])->where('type', 'employer|rental')->whereNumber('review')->name('reviews.update');
+        Route::patch('/review-reports/{report}', [AdminController::class, 'updateReviewReport'])->whereNumber('report')->name('review_reports.update');
+        Route::patch('/incidents/{incident}', [AdminController::class, 'updateIncident'])->whereNumber('incident')->name('incidents.update');
+
+        Route::post('/news', [AdminController::class, 'storeNews'])->name('news.store');
+        Route::patch('/news/{news}', [AdminController::class, 'updateNews'])->whereNumber('news')->name('news.update');
+        Route::delete('/news/{news}', [AdminController::class, 'deleteNews'])->whereNumber('news')->name('news.delete');
+
+        Route::patch('/employers/{employer}', [AdminController::class, 'updateEmployer'])->whereNumber('employer')->name('employers.update');
+        Route::patch('/landlords/{landlord}', [AdminController::class, 'updateLandlord'])->whereNumber('landlord')->name('landlords.update');
+
+        Route::post('/letters', [AdminController::class, 'storeLetter'])->name('letters.store');
+        Route::patch('/letters/{letter}', [AdminController::class, 'updateLetter'])->whereNumber('letter')->name('letters.update');
+        Route::delete('/letters/{letter}', [AdminController::class, 'deleteLetter'])->whereNumber('letter')->name('letters.delete');
+
+        Route::post('/safety', [AdminController::class, 'storeSafety'])->name('safety.store');
+        Route::patch('/safety/{article}', [AdminController::class, 'updateSafety'])->whereNumber('article')->name('safety.update');
+        Route::delete('/safety/{article}', [AdminController::class, 'deleteSafety'])->whereNumber('article')->name('safety.delete');
+
+        Route::post('/diasporas', [AdminController::class, 'storeDiaspora'])->name('diasporas.store');
+        Route::patch('/diasporas/{diaspora}', [AdminController::class, 'updateDiaspora'])->whereNumber('diaspora')->name('diasporas.update');
+        Route::post('/domains', [AdminController::class, 'storeDomain'])->name('domains.store');
+        Route::delete('/domains/{domain}', [AdminController::class, 'deleteDomain'])->whereNumber('domain')->name('domains.delete');
     });
 
     Route::get('/jobs', [PlatformController::class, 'jobs'])->name('jobs');
