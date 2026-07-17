@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LegalHelpController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\ReviewController;
@@ -74,7 +75,9 @@ Route::middleware(ResolveDiaspora::class)->group(function (): void {
     });
 
     Route::get('/jobs', [PlatformController::class, 'jobs'])->name('jobs');
-    Route::get('/letters', [PlatformController::class, 'letters'])->name('letters');
-    Route::post('/letters/{slug}/preview', [PlatformController::class, 'letterPreview'])->middleware('throttle:30,1')->name('letters.preview');
+    Route::get('/legal-help', [LegalHelpController::class, 'index'])->name('letters');
+    Route::post('/legal-help/{slug}/preview', [LegalHelpController::class, 'preview'])->middleware('throttle:30,1')->name('letters.preview');
+    Route::get('/letters', fn () => redirect()->route('letters', [], 301));
+    Route::post('/letters/{slug}/preview', [LegalHelpController::class, 'preview'])->middleware('throttle:30,1');
     Route::get('/safety', [PlatformController::class, 'safety'])->name('safety');
 });
